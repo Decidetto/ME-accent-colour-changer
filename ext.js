@@ -68,8 +68,8 @@ function readBaseHue(varName, fallback) {
 
 function computeDefaults() {
   return {
-    accent: readBaseHue("--accent-changer-src-mid", SAFE_FALLBACK.accent),
-    highlight: readBaseHue("--accent-changer-src-pink", SAFE_FALLBACK.highlight),
+    accent: readBaseHue("--accent-changer-accent-tint", SAFE_FALLBACK.accent),
+    highlight: readBaseHue("--accent-changer-highlight", SAFE_FALLBACK.highlight),
   };
 }
 
@@ -195,10 +195,10 @@ marinara.addStyle(`
     flex-shrink: 0;
   }
   .accent-changer-preview-accent {
-    background: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+    background: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l);
   }
   .accent-changer-preview-highlight {
-    background: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+    background: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
   }
   .accent-changer-row input[type="range"] {
     flex: 1;

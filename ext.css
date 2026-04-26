@@ -5,54 +5,58 @@
      --accent-changer-highlight-shift  -> the pink family (interactive highlights)
 
    THEME COMPATIBILITY:
-   Each rotation reads its base color from an --accent-changer-src-* CSS variable.
-   The :where() defaults block below provides zero-specificity baselines for the
-   engine's default theme; visual themes can override these at any non-zero
-   specificity (see the SillyTavern mapping at the bottom of this file). JS
-   reads the resolved values via getComputedStyle to compute per-theme default
-   slider positions.
+   Each rotation reads its base color from one of the source variables below.
+   The :where() defaults provide zero-specificity baselines for the engine's
+   default theme; visual themes can override these at any non-zero specificity
+   (see the SillyTavern mapping at the bottom of this file). JS reads the
+   resolved values via getComputedStyle to compute per-theme default slider
+   positions.
 
    Source variables (override per mode in your visual theme):
-     Highlight family: --accent-changer-src-pink, --accent-changer-src-pastel-rose
-     Accent family:    --accent-changer-src-background,
-                       --accent-changer-src-accent-deep,
-                       --accent-changer-src-accent-deep-on,
-                       --accent-changer-src-surface,
-                       --accent-changer-src-surface-on,
-                       --accent-changer-src-mid,
-                       --accent-changer-src-sidebar,
-                       --accent-changer-src-sky,
-                       --accent-changer-src-y2k-purple,
-                       --accent-changer-src-y2k-lavender */
+     Highlight family:
+       --accent-changer-highlight        Bold interactive base — drives --primary, --ring
+       --accent-changer-highlight-soft   Soft highlight — drives --pastel-rose
+     Accent family:
+       --accent-changer-accent-background  Page background
+       --accent-changer-accent-sidebar     Sidebar surface
+       --accent-changer-accent-surface     Subtle surface — drives --secondary, --muted
+       --accent-changer-accent-surface-fg  Foreground on subtle surface
+       --accent-changer-accent-strong      Emphasized accent surface — drives --accent
+       --accent-changer-accent-strong-fg   Foreground on emphasis
+       --accent-changer-accent-tint        Dominant accent tint — drives --border, --input,
+                                           --muted-foreground, sidebar-border, glow tints
+       --accent-changer-accent-cool        Cool accent — drives glass cool stop, --glow-color-3
+
+   The engine's decorative palette colors --y2k-purple and --y2k-lavender (used
+   only by the scrollbar thumb gradient) are derived from --accent-changer-accent-tint
+   so themes don't have to declare them separately. */
 
 /* ─── Default-theme source-variable defaults ─────────────────────────────
    :where() gives these (0,0,0) specificity. Any visual theme rule wins. */
 :where(:root, [data-theme="dark"]) {
-  --accent-changer-src-pink: #ffb3d9;
-  --accent-changer-src-pastel-rose: #ffd1e3;
-  --accent-changer-src-background: #050312;
-  --accent-changer-src-accent-deep: #2a1a3e;
-  --accent-changer-src-accent-deep-on: #f0e8ff;
-  --accent-changer-src-surface: #1a1a2e;
-  --accent-changer-src-surface-on: #e8d4ff;
-  --accent-changer-src-mid: #d4adfc;
-  --accent-changer-src-sidebar: #08061a;
-  --accent-changer-src-sky: #a8d8ff;
-  --accent-changer-src-y2k-purple: #d4adfc;
-  --accent-changer-src-y2k-lavender: #e8d4ff;
+  --accent-changer-highlight: #ffb3d9;
+  --accent-changer-highlight-soft: #ffd1e3;
+  --accent-changer-accent-background: #050312;
+  --accent-changer-accent-sidebar: #08061a;
+  --accent-changer-accent-surface: #1a1a2e;
+  --accent-changer-accent-surface-fg: #e8d4ff;
+  --accent-changer-accent-strong: #2a1a3e;
+  --accent-changer-accent-strong-fg: #f0e8ff;
+  --accent-changer-accent-tint: #d4adfc;
+  --accent-changer-accent-cool: #a8d8ff;
 }
 
 :where([data-theme="light"]) {
-  --accent-changer-src-pink: #e0709a;
-  --accent-changer-src-background: #faf8ff;
-  --accent-changer-src-accent-deep: #ede4f7;
-  --accent-changer-src-accent-deep-on: #1a1025;
-  --accent-changer-src-surface: #f0eaf7;
-  --accent-changer-src-surface-on: #3a2960;
-  --accent-changer-src-mid: #7a64a0;
-  --accent-changer-src-sidebar: #f5f0fc;
-  --accent-changer-src-y2k-purple: #9b6ec6;
-  --accent-changer-src-y2k-lavender: #b088e0;
+  --accent-changer-highlight: #e0709a;
+  --accent-changer-accent-background: #faf8ff;
+  --accent-changer-accent-sidebar: #f5f0fc;
+  --accent-changer-accent-surface: #f0eaf7;
+  --accent-changer-accent-surface-fg: #3a2960;
+  --accent-changer-accent-strong: #ede4f7;
+  --accent-changer-accent-strong-fg: #1a1025;
+  --accent-changer-accent-tint: #7a64a0;
+  /* --accent-changer-highlight-soft, --accent-changer-accent-cool inherit
+     from the dark/default block (engine doesn't redefine for light). */
 }
 
 /* Auto-contrast threshold (OKLCH lightness, 0–1). Above this, the rotated
@@ -62,74 +66,77 @@
   --accent-changer-fg-threshold: 0.89;
 }
 
-/* ─── ACCENT family (purple/lavender — broad UI tinting) ─── */
+/* ─── ACCENT family (purple/lavender — broad UI tinting) ───
+   --y2k-purple is the rotated tint as-is; --y2k-lavender is the same
+   rotated tint with an OKLCH lightness boost so the scrollbar thumb's
+   bottom gradient stop stays a softer variant of the top stop. */
 :root,
 :root[data-theme="dark"] {
-  --background: hsl(from var(--accent-changer-src-background) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --accent: hsl(from var(--accent-changer-src-accent-deep) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --accent-foreground: hsl(from var(--accent-changer-src-accent-deep-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --secondary: hsl(from var(--accent-changer-src-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --secondary-foreground: hsl(from var(--accent-changer-src-surface-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --muted: hsl(from var(--accent-changer-src-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --muted-foreground: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --border: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
-  --input: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
-  --sidebar: hsl(from var(--accent-changer-src-sidebar) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --sidebar-foreground: hsl(from var(--accent-changer-src-surface-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --sidebar-border: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.13);
-  --y2k-purple: hsl(from var(--accent-changer-src-y2k-purple) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --y2k-lavender: hsl(from var(--accent-changer-src-y2k-lavender) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --glow-accent: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.12);
-  --glow-color-2: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
-  --glow-color-3: hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
-  --glow-sm-2: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
+  --background: hsl(from var(--accent-changer-accent-background) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --accent: hsl(from var(--accent-changer-accent-strong) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --accent-foreground: hsl(from var(--accent-changer-accent-strong-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --secondary: hsl(from var(--accent-changer-accent-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --secondary-foreground: hsl(from var(--accent-changer-accent-surface-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --muted: hsl(from var(--accent-changer-accent-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --muted-foreground: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --border: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
+  --input: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
+  --sidebar: hsl(from var(--accent-changer-accent-sidebar) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --sidebar-foreground: hsl(from var(--accent-changer-accent-surface-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --sidebar-border: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.13);
+  --y2k-purple: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --y2k-lavender: oklch(from hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l) calc(l + 0.1) c h);
+  --glow-accent: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.12);
+  --glow-color-2: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
+  --glow-color-3: hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
+  --glow-sm-2: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
 }
 
 :root[data-theme="light"] {
-  --background: hsl(from var(--accent-changer-src-background) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --accent: hsl(from var(--accent-changer-src-accent-deep) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --accent-foreground: hsl(from var(--accent-changer-src-accent-deep-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --secondary: hsl(from var(--accent-changer-src-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --secondary-foreground: hsl(from var(--accent-changer-src-surface-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --muted: hsl(from var(--accent-changer-src-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --muted-foreground: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --border: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.27);
-  --input: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.27);
-  --sidebar: hsl(from var(--accent-changer-src-sidebar) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --sidebar-foreground: hsl(from var(--accent-changer-src-surface-on) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --sidebar-border: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
-  --y2k-purple: hsl(from var(--accent-changer-src-y2k-purple) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --y2k-lavender: hsl(from var(--accent-changer-src-y2k-lavender) calc(h + var(--accent-changer-accent-shift, 0)) s l);
-  --glow-accent: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
-  --glow-color-2: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.15);
-  --glow-color-3: hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
-  --glow-sm-2: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
+  --background: hsl(from var(--accent-changer-accent-background) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --accent: hsl(from var(--accent-changer-accent-strong) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --accent-foreground: hsl(from var(--accent-changer-accent-strong-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --secondary: hsl(from var(--accent-changer-accent-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --secondary-foreground: hsl(from var(--accent-changer-accent-surface-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --muted: hsl(from var(--accent-changer-accent-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --muted-foreground: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --border: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.27);
+  --input: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.27);
+  --sidebar: hsl(from var(--accent-changer-accent-sidebar) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --sidebar-foreground: hsl(from var(--accent-changer-accent-surface-fg) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --sidebar-border: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.2);
+  --y2k-purple: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l);
+  --y2k-lavender: oklch(from hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l) calc(l + 0.1) c h);
+  --glow-accent: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
+  --glow-color-2: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.15);
+  --glow-color-3: hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
+  --glow-sm-2: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.08);
 }
 
 /* ─── HIGHLIGHT family (pink — interactive highlights) ─── */
 :root,
 :root[data-theme="dark"] {
-  --primary: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --ring: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --sidebar-accent: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1);
-  --sidebar-accent-foreground: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --y2k-pink: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --pastel-rose: hsl(from var(--accent-changer-src-pastel-rose) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --glow-primary: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.15);
-  --glow-color-1: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.3);
-  --glow-sm-1: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.2);
+  --primary: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --ring: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --sidebar-accent: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1);
+  --sidebar-accent-foreground: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --y2k-pink: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --pastel-rose: hsl(from var(--accent-changer-highlight-soft) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --glow-primary: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.15);
+  --glow-color-1: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.3);
+  --glow-sm-1: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.2);
 }
 
 :root[data-theme="light"] {
-  --primary: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --ring: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --sidebar-accent: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.094);
-  --sidebar-accent-foreground: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --y2k-pink: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --pastel-rose: hsl(from var(--accent-changer-src-pastel-rose) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
-  --glow-primary: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1);
-  --glow-color-1: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.2);
-  --glow-sm-1: hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.15);
+  --primary: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --ring: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --sidebar-accent: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.094);
+  --sidebar-accent-foreground: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --y2k-pink: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --pastel-rose: hsl(from var(--accent-changer-highlight-soft) calc(h + var(--accent-changer-highlight-shift, 0)) s l);
+  --glow-primary: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1);
+  --glow-color-1: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.2);
+  --glow-sm-1: hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.15);
 }
 
 /* ─── Mixed gradients (highlight stop, then accent stops) ─── */
@@ -139,30 +146,30 @@
 :root[data-theme="dark"] {
   --glass-bg: linear-gradient(
     135deg,
-    hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.06) 0%,
-    hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 50%,
-    hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 100%
+    hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.06) 0%,
+    hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 50%,
+    hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 100%
   );
   --glass-strong-bg: linear-gradient(
     135deg,
-    hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1) 0%,
-    hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 50%,
-    hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 100%
+    hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1) 0%,
+    hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 50%,
+    hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 100%
   );
 }
 
 :root[data-theme="light"] {
   --glass-bg: linear-gradient(
     135deg,
-    hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.06) 0%,
-    hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 50%,
-    hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 100%
+    hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.06) 0%,
+    hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 50%,
+    hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.06) 100%
   );
   --glass-strong-bg: linear-gradient(
     135deg,
-    hsl(from var(--accent-changer-src-pink) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1) 0%,
-    hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 50%,
-    hsl(from var(--accent-changer-src-sky) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 100%
+    hsl(from var(--accent-changer-highlight) calc(h + var(--accent-changer-highlight-shift, 0)) s l / 0.1) 0%,
+    hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 50%,
+    hsl(from var(--accent-changer-accent-cool) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1) 100%
   );
 }
 
@@ -190,45 +197,42 @@
    applies; ST's `[data-visual-theme] ::-webkit-scrollbar-track` rule beats
    us and its transparent track is preserved. */
 ::-webkit-scrollbar-track {
-  background: hsl(from var(--accent-changer-src-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.25);
+  background: hsl(from var(--accent-changer-accent-surface) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.25);
 }
 [data-theme="light"] ::-webkit-scrollbar-track {
-  background: hsl(from var(--accent-changer-src-mid) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
+  background: hsl(from var(--accent-changer-accent-tint) calc(h + var(--accent-changer-accent-shift, 0)) s l / 0.1);
 }
 
 /* ─── Visual theme: SillyTavern ─────────────────────────────────────────────
-   Map our --accent-changer-src-* vars to ST's actual base colors so the
+   Map our --accent-changer-* source vars to ST's actual base colors so the
    rotation knobs shift ST's blue interactive accent (and slightly-tinted
    surfaces) instead of pink. Selectors mirror sillytavern.css's own
    specificity (0,2,0 in dark, 0,2,0 in light); the rotation rules above
-   (also 0,2,0 via :root[…]) tie and win on cascade order. */
+   (also 0,2,0 via :root[…]) tie ST's variable definitions and win on
+   cascade order. */
 [data-visual-theme="sillytavern"],
 [data-visual-theme="sillytavern"][data-theme="dark"] {
-  --accent-changer-src-pink: #4a72b0;            /* ST primary blue */
-  --accent-changer-src-pastel-rose: #9090b8;     /* ST pastel-rose mapping */
-  --accent-changer-src-background: #0b0b0f;      /* ST page background */
-  --accent-changer-src-accent-deep: #1e1e2e;     /* ST accent surface */
-  --accent-changer-src-accent-deep-on: #cccccc;  /* ST accent foreground */
-  --accent-changer-src-surface: #16161e;         /* ST secondary/muted surface */
-  --accent-changer-src-surface-on: #c0bfcf;      /* ST secondary/sidebar foreground */
-  --accent-changer-src-mid: #8888a0;             /* ST muted-foreground / border tone */
-  --accent-changer-src-sidebar: #0e0e14;         /* ST sidebar surface */
-  --accent-changer-src-sky: #50a0b0;             /* ST cyan (third glass stop) */
-  --accent-changer-src-y2k-purple: #7a7aaa;
-  --accent-changer-src-y2k-lavender: #9090b8;
+  --accent-changer-highlight: #4a72b0;            /* ST primary blue */
+  --accent-changer-highlight-soft: #9090b8;       /* ST pastel-rose mapping */
+  --accent-changer-accent-background: #0b0b0f;    /* ST page background */
+  --accent-changer-accent-sidebar: #0e0e14;       /* ST sidebar surface */
+  --accent-changer-accent-surface: #16161e;       /* ST secondary/muted surface */
+  --accent-changer-accent-surface-fg: #c0bfcf;    /* ST secondary/sidebar foreground */
+  --accent-changer-accent-strong: #1e1e2e;        /* ST accent surface */
+  --accent-changer-accent-strong-fg: #cccccc;     /* ST accent foreground */
+  --accent-changer-accent-tint: #8888a0;          /* ST muted-foreground / border tone */
+  --accent-changer-accent-cool: #50a0b0;          /* ST cyan (third glass stop) */
 }
 
 [data-visual-theme="sillytavern"][data-theme="light"] {
-  --accent-changer-src-pink: #3a609a;
-  --accent-changer-src-background: #e8e8ec;
-  --accent-changer-src-accent-deep: #d4d4de;
-  --accent-changer-src-accent-deep-on: #1a1a24;
-  --accent-changer-src-surface: #d8d8e0;
-  --accent-changer-src-surface-on: #2a2a3e;
-  --accent-changer-src-mid: #606078;
-  --accent-changer-src-sidebar: #dddde4;
-  --accent-changer-src-y2k-purple: #5a5a80;
-  --accent-changer-src-y2k-lavender: #606088;
-  /* --accent-changer-src-pastel-rose, --accent-changer-src-sky inherit
+  --accent-changer-highlight: #3a609a;
+  --accent-changer-accent-background: #e8e8ec;
+  --accent-changer-accent-sidebar: #dddde4;
+  --accent-changer-accent-surface: #d8d8e0;
+  --accent-changer-accent-surface-fg: #2a2a3e;
+  --accent-changer-accent-strong: #d4d4de;
+  --accent-changer-accent-strong-fg: #1a1a24;
+  --accent-changer-accent-tint: #606078;
+  /* --accent-changer-highlight-soft, --accent-changer-accent-cool inherit
      ST's dark values (ST itself does not redefine them in light mode). */
 }
