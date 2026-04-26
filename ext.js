@@ -306,7 +306,7 @@ function openPopover(anchor) {
   popover = document.createElement("div");
   popover.className = "accent-changer-popover";
   popover.innerHTML = `
-    <h3>Hue Rotation</h3>
+    <h3>Pick Hues</h3>
     ${buildSliderRow("Accent", "accent-changer-preview-accent", state.accent)}
     ${buildSliderRow("Highlight", "accent-changer-preview-highlight", state.highlight)}
     <div class="accent-changer-actions">
